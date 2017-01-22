@@ -1,0 +1,14 @@
+# [START app_yaml]
+runtime: nodejs
+env: flex
+automatic_scaling:
+  min_num_instances: 1
+  max_num_instances: 4
+  cool_down_period_sec: 480
+env_variables:
+  NODE_ENV: 'production'
+  CLOUDSDK_APP_USE_GSUTIL: 1
+handlers:
+- url: .*
+  script: dist/app.js
+# [END app_yaml]
