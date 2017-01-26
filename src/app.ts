@@ -9,7 +9,7 @@ app.set('port', (process.env.PORT || 8080));
 app.use(bodyParser.json({ type: 'application/json' }));
 
 app.get("/", (req: express.Request, res: express.Response) => {
-    res.send("Hello world!");
+    res.send("Hello world!" + new Date());
 });
 
 app.post("/", (req: express.Request, res: express.Response) => {
