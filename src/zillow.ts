@@ -17,6 +17,12 @@ function parseEstimate(xml: string) {
   var document = new xmldom.DOMParser().parseFromString(xml);
   // console.log(xml);
   var estimate = xpath.select("//zestimate/amount/text()", document).toString();
+  try {
+    estimate = Number(estimate);
+  } catch (err) {
+    console.warn(`Estimate ${estimate} was not a number.`);
+    estimate = 0;
+  }
   console.log(`Estimate ${estimate}`);
   return estimate;
 }
