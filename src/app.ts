@@ -18,7 +18,7 @@ app.post("/", (req: express.Request, res: express.Response) => {
 
     const assistant = new ApiAiAssistant({ request: req, response: res });
 
-    let actionMap = new Map();
+    let actionMap = new Map(); 
     actionMap.set("carnival.book", bookCruiseIntent);
 
     assistant.handleRequest(actionMap);
