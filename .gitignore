@@ -28,6 +28,7 @@ build/Release
 
 # Dependency directories
 node_modules
+!node_modules/@types/actions-on-google/index.d.ts
 jspm_packages
 
 # Optional npm cache directory
