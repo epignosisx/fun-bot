@@ -9,7 +9,9 @@ export const PICK_A_SAILING_INTENT = "pick-a-sailing";
 //session data
 export const SAILINGS_DATA = "SailingsData";
 export const SELECTED_SAILING_DATA = "SelectedSailing";
-export const NUMBER_OF_GUESTS_DATA = "NumberOfGuests"
+export const NUMBER_OF_GUESTS_DATA = "NumberOfGuests";
+export const CABIN_DATA = "SelectedCabin";
+export const COURTESY_HOLD_DATA = "CourtesyHoldData";
 
 //user info
 export const PERSON_NAME = "Alex";

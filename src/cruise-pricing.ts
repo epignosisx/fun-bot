@@ -27,7 +27,7 @@ interface IMetaPrice {
     stateroomTypePrices: IStateroomTypePrice[];
 }
 
-export interface IStateroomTypePrice {
+interface IStateroomTypePrice {
     code: string; //meta subcategory
     isGtee: boolean;
     metaCode: string;
@@ -36,7 +36,7 @@ export interface IStateroomTypePrice {
     taxesAndFees: number;
 }
 
-export function price(priceRequest: IPricingRequest, callback: (result: IStateroomTypePrice) => void) {
+export function price(priceRequest: IPricingRequest, callback: (result: IBookingResponse) => void) {
     let apiRequest = {
         cabinQualifiers: [
             { 
@@ -48,7 +48,7 @@ export function price(priceRequest: IPricingRequest, callback: (result: IStatero
                 stateOfResidency: c.PERSON_STATE
             }
         ],
-        durationDays: 4,
+        durationDays: priceRequest.duration,
         sailDate: moment(priceRequest.sailDate).tz("America/New_York").format('MMDDYYYY'),
         sailingId: priceRequest.sailingId,
         shipCode: priceRequest.shipCode
@@ -60,9 +60,9 @@ export function price(priceRequest: IPricingRequest, callback: (result: IStatero
         method: "POST",
     };
 
-    request(META_PRICE_URL, requestOptions, (err: any, response: any, body: any) => {
-        let apiResponse: IPricingApiResponse = JSON.parse(body);
-        console.info("MetaPrice response", apiResponse);
+    console.info("Pricing api request", apiRequest);
+    request(META_PRICE_URL, requestOptions, (err: any, response: any, apiResponse: IPricingApiResponse) => {
+        console.info("Pricing api response", apiResponse);
         let metaPrice: IMetaPrice = apiResponse.metaPrices.filter(n => n.code === priceRequest.metaCode)[0];
         let lowestPrice: IStateroomTypePrice = metaPrice.stateroomTypePrices[0];
         console.info("MetaPrice lowest price", lowestPrice);
@@ -76,9 +76,9 @@ export function price(priceRequest: IPricingRequest, callback: (result: IStatero
             sailingId: priceRequest.sailingId,
             shipCode: priceRequest.shipCode,
             stateroomTypeCode: lowestPrice.code
-        })
-
-        callback(lowestPrice);
+        }, (bookingResponse: IBookingResponse) => {
+            callback(bookingResponse);
+        });
     });
 }
 
@@ -94,7 +94,7 @@ interface IBookingRequest {
 }
 
 interface IBookingApiResponse {
-
+    cabins: IBookingCabinApiResponse[];
 }
 
 interface IBookingCabinApiResponse {
@@ -162,6 +162,7 @@ export interface IBookingResponse {
     isGratuitiesRequired: boolean;
     stateroomNumber: string;
     stateroomTypeCode: string;
+    optionDate: string;
     guestPrices: {
         cruiseAmount: number;
         gratuityAmount: number;
@@ -171,7 +172,7 @@ export interface IBookingResponse {
     }[];
 }
 
-export function booking(bookingRequest: IBookingRequest) {
+function booking(bookingRequest: IBookingRequest, callback: (response: IBookingResponse) => void) {
     let apiRequest: any = {
         cabinholdaction: "hold",
         requestType: "FullBookingWithAlternatives",
@@ -210,12 +211,32 @@ export function booking(bookingRequest: IBookingRequest) {
         body: apiRequest
     };
 
-    request(BOOKING_URL, options, (err: any, res: any, body: any) => {
-        const apiResponse = JSON.parse(body);
-        //TODO: to be continued
+    console.info("Booking api request", apiRequest);
+    request(BOOKING_URL, options, (err: any, res: any, apiResponse: IBookingApiResponse) => {
+        console.info("Booking api response", apiResponse);
+        const cabin = apiResponse.cabins[0];
+        let bookingResponse: IBookingResponse = {
+            optionDate: cabin.courtesyHoldOptionDate,
+            categoryCode: cabin.selections.categoryCode,
+            deckCode: cabin.options.decks.filter(n => n.available)[0].code,
+            locationCode: cabin.options.locations[0].code,
+            depositAmount: cabin.selections.totals.depositAmount,
+            finalPaymentAmount: cabin.selections.totals.totalCabinAmount + cabin.selections.totals.totalTaxAndFees,
+            isGratuitiesRequired: cabin.selections.forcePrepaidGratuities,
+            stateroomNumber: cabin.options.rooms[0].code,
+            stateroomTypeCode: cabin.selections.stateroomTypeCode,
+            upgradeCode: cabin.selections.upgradeCode,
+            guestPrices: cabin.selections.totals.guestPrices.map(g =>  { 
+                return {
+                    cruiseAmount: g.cruiseAmount,
+                    gratuityAmount: g.gratuityAmount,
+                    insuranceAmount: g.insuranceAmount,
+                    taxesAmount: g.taxesAmount,
+                    totalAmount: g.totalAmount
+                };
+            })
+        };
+        console.info("Booking response", bookingResponse);
+        callback(bookingResponse);
     });
-}
-
-function iso8601toMMddyyyy(value: string) {
-    return moment(value).tz("America/New_York").format('MMDDYYYY');
 }

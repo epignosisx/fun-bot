@@ -24,25 +24,16 @@ export interface ISailingData {
     metacode: string;
     rateCode: string;
     destCode: string;
+    destName: string;
     shipCode: string;
     price: number;
+    departurePortName: string;
 }
 
 export function flattenSailings(sailings: IItinerarySailing[]): ISailingData[] {
     return sailings.map(s => {
         let sailingDate = formatDate(s.sailing.departureDate);
-        let itinName = [
-            s.itinerary.dur,
-            "days from",
-            s.itinerary.departurePortName.split(",")[0],
-            "to",
-            s.itinerary.regionName,
-            formatStateroomType(s.room.metacode),
-            "for",
-            "$" + s.room.price,
-            "on",
-            sailingDate
-        ].join(" ");
+        let itinName = formatItineraryName(s.itinerary.dur, s.itinerary.departurePortName, s.itinerary.regionName, s.room.metacode, s.room.price, false, s.sailing.departureDate);
         return {
             itinCode: s.itinerary.id.split("_")[0],
             sailingDate: s.sailing.departureDate,
@@ -52,10 +43,34 @@ export function flattenSailings(sailings: IItinerarySailing[]): ISailingData[] {
             price: s.room.price,
             rateCode: s.room.rateCode,
             destCode: s.itinerary.regionCode,
+            destName: s.itinerary.regionName,
             shipCode: s.itinerary.shipCode,
-            itineraryName: itinName
+            itineraryName: itinName,
+            departurePortName: s.itinerary.departurePortName
         };
     });
+}
+
+export function formatItineraryName(dur: number, departurePortName: string, regionName: string, metacode: string, price: number, includesTax: boolean, sailDate8601: string): string {
+    let sailingDate = formatDate(sailDate8601);
+    let priceText = "$" + price;
+    if(includesTax) {
+        priceText += " including taxes";
+    }
+    let itinName = [
+        dur,
+        "days from",
+        departurePortName.split(",")[0],
+        "to",
+        regionName,
+        formatStateroomType(metacode),
+        "for",
+        "$" + priceText,
+        "on",
+        sailingDate
+    ].join(" ");
+
+    return itinName;
 }
 
 function formatStateroomType(metacode: string) {

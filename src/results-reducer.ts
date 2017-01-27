@@ -69,7 +69,7 @@ function findCheapestItinerarySailing(metacode: string, itinerary: IItinerary): 
     return { sailing: cheapestSailing, room: cheapestRoom, itinerary: itinerary };
 }
 
-function getRoom(metacode: string, sailing: ISailing) {
+function getRoom(metacode: string, sailing: ISailing):IRoom {
     switch (metacode) {
         case "IS":
         case "UL":
