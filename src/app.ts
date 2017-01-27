@@ -7,11 +7,11 @@ import { flattenSailings, ISailingData } from "./sailing-flattener"
 import { bookACruise } from "./intent-book-a-cruise"
 import { pickASailing } from "./intent-pick-a-sailing";
 import { findCruiseDeals, pickCruiseDeal } from "./intent-cruise-deals";
-import {getDob} from "./intent-get-dob"
+import { getDob } from "./intent-get-dob"
 import * as c from "./constants"
 import * as zillow from "./zillow";
 import * as ch from "./courtesy-hold";
-
+import * as payment from "./payment";
 
 process.env.DEBUG = 'actions-on-google:*';
 
@@ -38,6 +38,10 @@ app.get("/", (req: express.Request, res: express.Response) => {
     //     cruiseDeals.deals.forEach(function(deal){
     //         console.log(`Deal: ${deal.description}, Rate Codes: ${deal.rateCodes}, Url: ${deal.url}`);
     //     });
+    // });
+
+    // payment.getAntiforgeryData(function (data) {
+    //     console.info(`Found data: ${JSON.stringify(data)}`);
     // });
 
     res.send("Hello world!" + new Date());
