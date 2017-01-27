@@ -13,6 +13,7 @@ export interface IProfileRequest {
 }
 
 export interface IProfileResponse {
+    authCookie: string;
     loyaltyNumber: string;
     countryCode: string;
     dobDay: number;
@@ -63,7 +64,9 @@ export function createProfile(profileRequest: IProfileRequest, callback: (result
     console.info("Create Profile api request", apiRequest);
     request(CREATE_PROFILE_URL, options, (err: any, res: any, responseApi: {loyaltyNumber: string}) => {
         console.log("Create profile api response", responseApi);
+        const authCookieValue = extractAuthCookie(res.headers["set-cookie"]);
         var profileResponse: IProfileResponse = {
+            authCookie: authCookieValue,
             loyaltyNumber: responseApi.loyaltyNumber,
             firstName: apiRequest.firstName,
             lastName: apiRequest.lastName,
@@ -79,4 +82,12 @@ export function createProfile(profileRequest: IProfileRequest, callback: (result
         };
         callback(profileResponse)
     });
+}
+
+function extractAuthCookie(cookieHeader: string[]): string {
+    const authCookieName = ".ASPXAUTH=";
+    let authCookie = cookieHeader.filter(n => n.indexOf(authCookieName) >= 0)[0];
+    let firstPiece = authCookie.split(";")[0].trim();
+    console.info("Auth cookie value", firstPiece);
+    return firstPiece;
 }

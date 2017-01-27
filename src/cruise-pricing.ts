@@ -159,6 +159,7 @@ export interface IBookingResponse {
     upgradeCode: string;
     depositAmount: number;
     finalPaymentAmount: number;
+    finalPaymentDate: string;
     isGratuitiesRequired: boolean;
     stateroomNumber: string;
     stateroomTypeCode: string;
@@ -219,12 +220,13 @@ function booking(bookingRequest: IBookingRequest, callback: (response: IBookingR
         const location = cabin.options.locations[0];
         const room = cabin.options.rooms[0];
         let bookingResponse: IBookingResponse = {
-            optionDate: cabin.courtesyHoldOptionDate,
+            optionDate: new Date(cabin.courtesyHoldOptionDate).toISOString(),
             categoryCode: cabin.selections.categoryCode,
             deckCode: deck ? deck.code : null,
             locationCode: location ? location.code : null,
             depositAmount: cabin.selections.totals.depositAmount,
             finalPaymentAmount: cabin.selections.totals.totalCabinAmount + cabin.selections.totals.totalTaxAndFees,
+            finalPaymentDate: cabin.selections.totals.finalPaymentDate,
             isGratuitiesRequired: cabin.selections.forcePrepaidGratuities,
             stateroomNumber: room ? room.code : null,
             stateroomTypeCode: cabin.selections.stateroomTypeCode,
