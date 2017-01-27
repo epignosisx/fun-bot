@@ -24,6 +24,12 @@ app.get("/", (req: express.Request, res: express.Response) => {
     // chrq.stateroomTypeCode = "VIOBNB";
     // chrq.rank = 91;
     // ch.checkIfAvailable(chrq, function (response: ch.CourtesyHoldAvailabilityResponse) { });
+    
+    // ch.getCruiseDeals(function (cruiseDeals) {
+    //     cruiseDeals.deals.forEach(function(deal){
+    //         console.log(`Deal: ${deal.description}, Rate Codes: ${deal.rateCodes}, Url: ${deal.url}`);
+    //     });
+    // });
 
     res.send("Hello world!" + new Date());
 });
