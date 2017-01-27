@@ -1,6 +1,9 @@
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import { ApiAiAssistant } from "actions-on-google";
+import {cruiseSearch, ICruiseSearchRequest, ICruiseSearchResponse} from "./cruise-search";
+import {reduceResultsTest, reduceResults} from "./results-reducer";
+import {flattenSailings, ISailingData} from "./sailing-flattener"
 
 process.env.DEBUG = 'actions-on-google:*';
 
@@ -10,6 +13,17 @@ app.use(bodyParser.json({ type: 'application/json' }));
 
 app.get("/", (req: express.Request, res: express.Response) => {
     res.send("Hello world!" + new Date());
+});
+
+app.get("/search", (req: express.Request, res: express.Response) => {
+    // cruiseSearch({
+    //     dest: "BH"
+    // }, (results: any) => {
+    //     res.send(results);
+    // });
+
+    const data = reduceResultsTest();
+    res.send(data);
 });
 
 app.post("/", (req: express.Request, res: express.Response) => {
@@ -31,5 +45,34 @@ var server = app.listen(app.get('port'), function () {
 });
 
 function bookCruiseIntent(assistant: ApiAiAssistant){
+    makeCruiseSearch(assistant);
+
     assistant.tell("Webhook response!!");
 }
+
+function makeCruiseSearch(assistant: ApiAiAssistant) {
+    const dest = <string>assistant.getArgument("Destination");
+    const dateRange = <string>assistant.getArgument("SailingDateRange");
+    const passThruPorts = <string[]>assistant.getArgument("PassThruPorts");
+    const shipCode = <string>assistant.getArgument("Ship");
+    const embkPortCode = <string>assistant.getArgument("EmbarkationPort") || "MIA";
+
+    var searchRequest: ICruiseSearchRequest = {
+        dest: dest,
+        dateRange: dateRange,
+        passThroughPort: passThruPorts,
+        ship: shipCode,
+        embkPortCode: embkPortCode
+    };
+
+    cruiseSearch(searchRequest, (response: ICruiseSearchResponse) => {
+        const sailings = reduceResults(response, {metacode: "SU"});
+        const sailingsData: ISailingData[] = flattenSailings(sailings);
+
+
+    });
+}
+
+// function formatSailingResponse(sailingsData: ISailingData[], assistant: ApiAiAssistant) {
+//     assistant.ask("We found these itinearies: ")
+// }
