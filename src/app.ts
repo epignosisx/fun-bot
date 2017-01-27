@@ -5,7 +5,7 @@ import { cruiseSearch, ICruiseSearchRequest, ICruiseSearchResponse } from "./cru
 import { reduceResultsTest, reduceResults } from "./results-reducer";
 import { flattenSailings, ISailingData } from "./sailing-flattener"
 import { bookACruise } from "./intent-book-a-cruise"
-import { pickASailing } from "./intent-pick-a-sailing";
+import { pickASailing, proceedWithSailing } from "./intent-pick-a-sailing";
 import { findCruiseDeals, pickCruiseDeal } from "./intent-cruise-deals";
 import { getDob } from "./intent-get-dob"
 import { getPhoneNumber } from "./intent-get-phone-number"
@@ -68,6 +68,7 @@ app.post("/", (req: express.Request, res: express.Response) => {
     let actionMap = new Map();
     actionMap.set(c.BOOK_A_CRUISE_INTENT, bookACruise);
     actionMap.set(c.PICK_A_SAILING_INTENT, pickASailing);
+    actionMap.set(c.PROCEED_WITH_SAILING_CONTEXT, proceedWithSailing);
     actionMap.set(c.INTENT_FIND_CRUISE_DEAL, findCruiseDeals);
     actionMap.set(c.INTENT_PICK_CRUISE_DEAL, pickCruiseDeal);
     actionMap.set(c.GET_DOB_INTENT, getDob);
