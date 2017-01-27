@@ -18,7 +18,7 @@ app.set('port', (process.env.PORT || 8080));
 app.use(bodyParser.json({ type: 'application/json' }));
 
 app.get("/", (req: express.Request, res: express.Response) => {
-    // zillow.getPropertyEstimate("7471 NW 112th Path", "33178", function (estimate: number) { });
+    // zillow.getPropertyEstimate(c.PERSON_ADDRESS, c.PERSON_ZIP, function (estimate: number) { console.log(`Estimate ${estimate}`) });
 
     // var chrq = new ch.CourtesyHoldAvailabilityRequest();
     // chrq.optionDate = "2017-01-27T05:00:00.000Z";
@@ -31,6 +31,12 @@ app.get("/", (req: express.Request, res: express.Response) => {
     // chrq.stateroomTypeCode = "VIOBNB";
     // chrq.rank = 91;
     // ch.checkIfAvailable(chrq, function (response: ch.CourtesyHoldAvailabilityResponse) { });
+    
+    // ch.getCruiseDeals(function (cruiseDeals) {
+    //     cruiseDeals.deals.forEach(function(deal){
+    //         console.log(`Deal: ${deal.description}, Rate Codes: ${deal.rateCodes}, Url: ${deal.url}`);
+    //     });
+    // });
 
     res.send("Hello world!" + new Date());
 });

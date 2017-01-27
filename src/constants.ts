@@ -16,6 +16,8 @@ export const COURTESY_HOLD_DATA = "CourtesyHoldData";
 //user info
 export const PERSON_NAME = "Alex";
 export const PERSON_STATE = "FL";
+export const PERSON_ADDRESS = "14525 SW 88TH ST APT J309";
+export const PERSON_ZIP = "33186";
 
 //app
 export const CARNIVAL_BASE_URL = "https://www.carnival.com"

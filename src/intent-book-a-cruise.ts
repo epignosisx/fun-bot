@@ -1,10 +1,11 @@
 import { ApiAiAssistant } from "actions-on-google";
-import {cruiseSearch, ICruiseSearchRequest, ICruiseSearchResponse} from "./cruise-search";
-import {reduceResultsTest, reduceResults} from "./results-reducer";
-import {flattenSailings, ISailingData} from "./sailing-flattener"
+import { cruiseSearch, ICruiseSearchRequest, ICruiseSearchResponse } from "./cruise-search";
+import { reduceResultsTest, reduceResults } from "./results-reducer";
+import { flattenSailings, ISailingData } from "./sailing-flattener"
 import * as zillow from "./zillow";
 import * as ch from "./courtesy-hold";
-import * as c from "./constants"
+import * as c from "./constants";
+import * as sr from './stateroom-recommender';
 
 export function bookACruise(assistant: ApiAiAssistant) {
     makeCruiseSearch(assistant);
@@ -27,22 +28,25 @@ function makeCruiseSearch(assistant: ApiAiAssistant) {
         numberOfGuests: numberOfGuests
     };
 
-    cruiseSearch(searchRequest, (response: ICruiseSearchResponse) => {
-        const sailings = reduceResults(response, {metacode: "SU"});
-        const sailingsData: ISailingData[] = flattenSailings(sailings);
-        const question = formatResponse(sailingsData);
-        console.info(question, sailingsData);
-        assistant.data[c.SAILINGS_DATA] = sailingsData;
-        assistant.data[c.NUMBER_OF_GUESTS_DATA] = numberOfGuests;
-        assistant.setContext(c.PICK_SAILING_CONTEXT);
-        assistant.ask(question);
+    zillow.getPropertyEstimate(c.PERSON_ADDRESS, c.PERSON_ZIP, function (estimate) {
+        const stateroom_metacode = sr.recommend(estimate);
+        cruiseSearch(searchRequest, (response: ICruiseSearchResponse) => {
+            const sailings = reduceResults(response, { metacode: stateroom_metacode });
+            const sailingsData: ISailingData[] = flattenSailings(sailings);
+            const question = formatResponse(sailingsData);
+            console.info(question, sailingsData);
+            assistant.data[c.SAILINGS_DATA] = sailingsData;
+            assistant.data[c.NUMBER_OF_GUESTS_DATA] = numberOfGuests;
+            assistant.setContext(c.PICK_SAILING_CONTEXT);
+            assistant.ask(question);
+        });
     });
 }
 
 function formatResponse(sailingsData: ISailingData[]) {
     let text = `We have found ${sailingsData.length} great sailings. `;
 
-    text += sailingsData.map((n, i) => `Number ${i+1}: ${n.itineraryName}. `).join("");
+    text += sailingsData.map((n, i) => `Number ${i + 1}: ${n.itineraryName}. `).join("");
     text += "What choice did you like?";
     return text;
 }
