@@ -1,11 +1,12 @@
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import { ApiAiAssistant } from "actions-on-google";
-import {cruiseSearch, ICruiseSearchRequest, ICruiseSearchResponse} from "./cruise-search";
-import {reduceResultsTest, reduceResults} from "./results-reducer";
-import {flattenSailings, ISailingData} from "./sailing-flattener"
-import {bookACruise} from "./intent-book-a-cruise"
-import {pickASailing} from "./intent-pick-a-sailing";
+import { cruiseSearch, ICruiseSearchRequest, ICruiseSearchResponse } from "./cruise-search";
+import { reduceResultsTest, reduceResults } from "./results-reducer";
+import { flattenSailings, ISailingData } from "./sailing-flattener"
+import { bookACruise } from "./intent-book-a-cruise"
+import { pickASailing } from "./intent-pick-a-sailing";
+import { findCruiseDeals, pickCruiseDeal } from "./intent-cruise-deals";
 import * as c from "./constants"
 import * as zillow from "./zillow";
 import * as ch from "./courtesy-hold";
@@ -31,7 +32,7 @@ app.get("/", (req: express.Request, res: express.Response) => {
     // chrq.stateroomTypeCode = "VIOBNB";
     // chrq.rank = 91;
     // ch.checkIfAvailable(chrq, function (response: ch.CourtesyHoldAvailabilityResponse) { });
-    
+
     // ch.getCruiseDeals(function (cruiseDeals) {
     //     cruiseDeals.deals.forEach(function(deal){
     //         console.log(`Deal: ${deal.description}, Rate Codes: ${deal.rateCodes}, Url: ${deal.url}`);
@@ -58,9 +59,11 @@ app.post("/", (req: express.Request, res: express.Response) => {
 
     const assistant = new ApiAiAssistant({ request: req, response: res });
 
-    let actionMap = new Map(); 
+    let actionMap = new Map();
     actionMap.set(c.BOOK_A_CRUISE_INTENT, bookACruise);
-    actionMap.set(c.PICK_A_SAILING_INTENT, pickASailing)
+    actionMap.set(c.PICK_A_SAILING_INTENT, pickASailing);
+    actionMap.set(c.INTENT_FIND_CRUISE_DEAL, findCruiseDeals);
+    actionMap.set(c.INTENT_PICK_CRUISE_DEAL, pickCruiseDeal);
 
     assistant.handleRequest(actionMap);
 });
