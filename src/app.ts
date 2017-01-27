@@ -54,7 +54,12 @@ app.post("/", (req: express.Request, res: express.Response) => {
     actionMap.set(c.GET_DOB_INTENT, getDob);
     actionMap.set(c.GET_PHONE_NUMBER_INTENT, getPhoneNumber);
 
-    assistant.handleRequest(actionMap);
+    try {
+        assistant.handleRequest(actionMap);
+    } catch (err) {
+        console.error(`Error handling request: ${JSON.stringify(err)}`);
+        assistant.tell("Something blew up in our side, please start over.");
+    }
 });
 
 // Start the server
