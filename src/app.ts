@@ -21,31 +21,9 @@ app.set('port', (process.env.PORT || 8080));
 app.use(bodyParser.json({ type: 'application/json' }));
 
 app.get("/", (req: express.Request, res: express.Response) => {
-    // zillow.getPropertyEstimate(c.PERSON_ADDRESS, c.PERSON_ZIP, function (estimate: number) { console.log(`Estimate ${estimate}`) });
-
-    // var chrq = new ch.CourtesyHoldAvailabilityRequest();
-    // chrq.optionDate = "2017-01-27T05:00:00.000Z";
-    // chrq.numberOfCabins = 1;
-    // chrq.metaCode = "OB";
-    // chrq.itineraryCode = "BAD";
-    // chrq.rateCode = "PEG";
-    // chrq.sailingDate = "2018-06-08T04:00:00.000Z";
-    // chrq.shipCode = "VI";
-    // chrq.stateroomTypeCode = "VIOBNB";
-    // chrq.rank = 91;
-    // ch.checkIfAvailable(chrq, function (response: ch.CourtesyHoldAvailabilityResponse) { });
-
-    // ch.getCruiseDeals(function (cruiseDeals) {
-    //     cruiseDeals.deals.forEach(function(deal){
-    //         console.log(`Deal: ${deal.description}, Rate Codes: ${deal.rateCodes}, Url: ${deal.url}`);
-    //     });
-    // });
-
-    // payment.getAntiforgeryData(function (data) {
-    //     console.info(`Found data: ${JSON.stringify(data)}`);
-    // });
-
-    res.send("Hello world!" + new Date());
+    var body = "<img style='max-width: 200px; max-height: 200px;' src='https://planetokashii.files.wordpress.com/2015/02/robot11.png' />";
+    body += "<h1>Hi, I am your friendly Fun Bot, here to help you with Carnival Cruise Line bookings.</h1>";
+    res.send(body);
 });
 
 app.get("/search", (req: express.Request, res: express.Response) => {
