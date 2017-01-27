@@ -28,9 +28,10 @@ export interface ISailingData {
     shipCode: string;
     price: number;
     departurePortName: string;
+    departurePortCode: string;
 }
 
-export function flattenSailings(sailings: IItinerarySailing[]): ISailingData[] {
+export function flattenSailings(embkPortCode: string, sailings: IItinerarySailing[]): ISailingData[] {
     return sailings.map(s => {
         let sailingDate = formatDate(s.sailing.departureDate);
         let itinName = formatItineraryName(s.itinerary.dur, s.itinerary.departurePortName, s.itinerary.regionName, s.room.metacode, s.room.price, false, s.sailing.departureDate);
@@ -46,7 +47,8 @@ export function flattenSailings(sailings: IItinerarySailing[]): ISailingData[] {
             destName: s.itinerary.regionName,
             shipCode: s.itinerary.shipCode,
             itineraryName: itinName,
-            departurePortName: s.itinerary.departurePortName
+            departurePortName: s.itinerary.departurePortName,
+            departurePortCode: embkPortCode
         };
     });
 }

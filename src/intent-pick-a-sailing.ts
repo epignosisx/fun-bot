@@ -30,7 +30,6 @@ export function pickASailing(assistant: ApiAiAssistant) {
             if(!availability.available) {
                 throw "Courtesy hold not available!";
             }
-
             let totalPrice = 0;
             result.guestPrices.forEach((g => totalPrice += g.totalAmount));
             const itinName = formatItineraryName(
@@ -43,12 +42,13 @@ export function pickASailing(assistant: ApiAiAssistant) {
                 selectedSailing.sailingDate
             );
 
+            const question = `Great! So I have you down for: ${itinName}. ${c.PERSON_NAME}. We can hold your stateroom for ${availability.depositHours} hours.I'll just need a bit more of information. What's your date of birth?`;
+            console.info(question);
             assistant.data[c.CABIN_DATA] = result;
             assistant.data[c.COURTESY_HOLD_DATA] = availability;
             assistant.data[c.SELECTED_SAILING_DATA] = selectedSailing;
             assistant.setContext(c.GET_DATE_OF_BIRTH_CONTEXT);
-            assistant.ask(`Great! So I have you down for: ${itinName}. ${c.PERSON_NAME}. We can hold your stateroom for ${availability.depositHours} hours.I'll just need a bit more of information. What's your date of birth?`);
-            return;
+            assistant.ask(question);
         });
     });
 }

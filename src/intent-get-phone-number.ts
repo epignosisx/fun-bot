@@ -1,6 +1,10 @@
 import { ApiAiAssistant } from "actions-on-google"
 import * as c from "./constants"
 import { createProfile, IProfileRequest, IProfileResponse } from "./profile"
+import {IBookingResponse} from "./cruise-pricing"
+import { createCourtesyHold, ICreateChApiResponse } from "./book"
+import { CourtesyHoldAvailabilityResponse } from "./courtesy-hold"
+import {ISailingData} from "./sailing-flattener"
 
 export function getPhoneNumber(assistant: ApiAiAssistant) {
     const phone = <string>assistant.getArgument("Number");
@@ -18,6 +22,14 @@ export function getPhoneNumber(assistant: ApiAiAssistant) {
 
     createProfile(profileRequest, (result: IProfileResponse) => {
         console.info("Profile created!", result.loyaltyNumber);
-        assistant.tell("Alright, we have put a hold on your cabin for 24 hours. You will receive an email shortly with more details.");
+
+        const cabin: IBookingResponse = assistant.data[c.CABIN_DATA];
+        const ch: CourtesyHoldAvailabilityResponse = assistant.data[c.COURTESY_HOLD_DATA];
+        const sailing: ISailingData = assistant.data[c.SELECTED_SAILING_DATA];
+
+        createCourtesyHold(cabin, ch, sailing, result, (result: ICreateChApiResponse) => {
+            const spelledOutBookingNumber = result.cabinResults[0].bookingNumber.split("").join(" ");
+            assistant.tell(`Alright, we have put a hold on your cabin for ${ch.depositHours} hours. Your booking number is ${spelledOutBookingNumber}. You will receive an email shortly with more details.`);
+        });
     });
 }

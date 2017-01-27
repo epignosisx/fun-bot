@@ -34,7 +34,7 @@ function makeCruiseSearch(assistant: ApiAiAssistant) {
         const stateroom_metacode = sr.recommend(estimate);
         cruiseSearch(searchRequest, (response: ICruiseSearchResponse) => {
             const sailings = reduceResults(response, { metacode: stateroom_metacode });
-            const sailingsData: ISailingData[] = flattenSailings(sailings);
+            const sailingsData: ISailingData[] = flattenSailings(searchRequest.embkPortCode, sailings);
             const question = formatResponse(sailingsData);
             console.info(question, sailingsData);
             assistant.data[c.SAILINGS_DATA] = sailingsData;
