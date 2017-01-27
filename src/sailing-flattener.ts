@@ -16,6 +16,7 @@ const monthNames = [
 ];
 
 export interface ISailingData {
+    itinCode: string;
     itineraryName: string;
     sailingDate: string;
     duration: number;
@@ -36,12 +37,14 @@ export function flattenSailings(sailings: IItinerarySailing[]): ISailingData[] {
             s.itinerary.departurePortName.split(",")[0],
             "to",
             s.itinerary.regionName,
-            "for $",
-            s.room.price,
+            formatStateroomType(s.room.metacode),
+            "for",
+            "$" + s.room.price,
             "on",
             sailingDate
         ].join(" ");
         return {
+            itinCode: s.itinerary.id.split("_")[0],
             sailingDate: s.sailing.departureDate,
             duration: s.itinerary.dur,
             sailingId: s.sailing.sailingId,
@@ -55,6 +58,21 @@ export function flattenSailings(sailings: IItinerarySailing[]): ISailingData[] {
     });
 }
 
+function formatStateroomType(metacode: string) {
+    switch(metacode) {
+        case "IS":
+            return "in an interior stateroom";
+        case "OS":
+            return "in an ocean view stateroom";
+        case "OB":
+            return "in a balcony stateroom";
+        case "SU":
+            return "in a suite";
+        default:
+            throw "Unknown metacode: " + metacode;
+    }
+}
+
 function formatDate(iso8601: string) {
     let date = new Date(iso8601);
     const month = date.getUTCMonth();
@@ -62,5 +80,5 @@ function formatDate(iso8601: string) {
     const day = date.getUTCDate();
     const year = date.getUTCFullYear();
 
-    return monthName + " " + day + " " + year;
+    return monthName + " " + day + ", " + year;
 }

@@ -4,6 +4,9 @@ import { ApiAiAssistant } from "actions-on-google";
 import {cruiseSearch, ICruiseSearchRequest, ICruiseSearchResponse} from "./cruise-search";
 import {reduceResultsTest, reduceResults} from "./results-reducer";
 import {flattenSailings, ISailingData} from "./sailing-flattener"
+import {bookACruise} from "./intent-book-a-cruise"
+import {pickASailing} from "./intent-pick-a-sailing";
+import * as c from "./constants"
 import * as zillow from "./zillow";
 import * as ch from "./courtesy-hold";
 
@@ -44,13 +47,14 @@ app.get("/search", (req: express.Request, res: express.Response) => {
 });
 
 app.post("/", (req: express.Request, res: express.Response) => {
-    console.log('headers: ' + JSON.stringify(req.headers));
+    //console.log('headers: ' + JSON.stringify(req.headers));
     console.log('body: ' + JSON.stringify(req.body));
 
     const assistant = new ApiAiAssistant({ request: req, response: res });
 
     let actionMap = new Map(); 
-    actionMap.set("carnival.book", bookCruiseIntent);
+    actionMap.set(c.BOOK_A_CRUISE_INTENT, bookACruise);
+    actionMap.set(c.PICK_A_SAILING_INTENT, pickASailing)
 
     assistant.handleRequest(actionMap);
 });
@@ -60,34 +64,3 @@ var server = app.listen(app.get('port'), function () {
     console.log('App listening on port %s', server.address().port);
     console.log('Press Ctrl+C to quit.');
 });
-
-function bookCruiseIntent(assistant: ApiAiAssistant){
-    makeCruiseSearch(assistant);
-}
-
-function makeCruiseSearch(assistant: ApiAiAssistant) {
-    const dest = <string>assistant.getArgument("Destination");
-    const dateRange = <string>assistant.getArgument("SailingDateRange");
-    const passThruPorts = <string[]>assistant.getArgument("PassThruPorts");
-    const shipCode = <string>assistant.getArgument("Ship");
-    const embkPortCode = <string>assistant.getArgument("EmbarkationPort") || "MIA";
-
-    var searchRequest: ICruiseSearchRequest = {
-        dest: dest,
-        dateRange: dateRange,
-        passThroughPort: passThruPorts,
-        ship: shipCode,
-        embkPortCode: embkPortCode
-    };
-
-    cruiseSearch(searchRequest, (response: ICruiseSearchResponse) => {
-        const sailings = reduceResults(response, {metacode: "SU"});
-        const sailingsData: ISailingData[] = flattenSailings(sailings);
-
-
-    });
-}
-
-// function formatSailingResponse(sailingsData: ISailingData[], assistant: ApiAiAssistant) {
-//     assistant.ask("We found these itinearies: ")
-// }

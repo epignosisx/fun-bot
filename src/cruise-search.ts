@@ -9,6 +9,7 @@ export interface ICruiseSearchRequest {
     passThroughPort?: string[];
     ship?: string;
     rateCode?: string;
+    numberOfGuests?: number;
 }
 
 export interface ICruiseSearchResponse {
@@ -48,7 +49,7 @@ export interface IRoom {
 }
 
 function toQs(params: ICruiseSearchRequest): string {
-    var arr = [];
+    var arr = ["exclDetails=false", "layout=grid", "numChildren=0", "pageNumber=1", "pageSize=8", "showBest=true", "sort=FromPrice", "useSuggestions=false"];
     if(params.dest) {
         arr.push("dest=" + encodeURIComponent(params.dest));
     }
@@ -70,6 +71,9 @@ function toQs(params: ICruiseSearchRequest): string {
         arr.push("datFrom=" + encodeURIComponent(ranges.from));
         arr.push("datTo=" + encodeURIComponent(ranges.to));
     }
+    if(params.numberOfGuests) {
+        arr.push("numAdults=" + params.numberOfGuests);
+    }
     return arr.join("&");
 }
 
@@ -82,14 +86,16 @@ function parseDateRange(dateRange: string): {from: string; to: string;} {
 
 function parseYearAndMonth(value: string) {
     const parts = value.split("-");//2017-02-01
-    return parts[0] + parts[1];
+    return parts[1] + parts[0]; //MMyyyy
 }
 
 export function cruiseSearch(params: ICruiseSearchRequest, callback: (result: any) => void) {
-    const qs = toQs(params);
+    const qs: string = toQs(params);
     console.info("Querystring: " + qs);
     const searchUrl = url + "?" + qs;
     request.get(searchUrl, (error, response, body) => {
-        callback(JSON.parse(body));
+        const searchResponse: ICruiseSearchResponse = JSON.parse(body);
+        console.log("Cruise Search response. Itineraries found: ", searchResponse.results.itineraries.length);
+        callback(searchResponse);
     });
 }
