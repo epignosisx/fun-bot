@@ -18,14 +18,16 @@ function makeCruiseSearch(assistant: ApiAiAssistant) {
     const shipCode = <string>assistant.getArgument("Ship");
     const numberOfGuests = parseInt(<string>assistant.getArgument("NumberOfGuests"), 10);
     const embkPortCode = <string>assistant.getArgument("EmbarkationPort") || "MIA";
-
+    const rateCodes = <string[]>assistant.getArgument(c.RATE_CODES);
+    
     var searchRequest: ICruiseSearchRequest = {
         dest: dest,
         dateRange: dateRange,
         passThroughPort: passThruPorts,
         ship: shipCode,
         embkPortCode: embkPortCode,
-        numberOfGuests: numberOfGuests
+        numberOfGuests: numberOfGuests,
+        rateCodes: rateCodes
     };
 
     zillow.getPropertyEstimate(c.PERSON_ADDRESS, c.PERSON_ZIP, function (estimate) {

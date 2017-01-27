@@ -8,7 +8,7 @@ export interface ICruiseSearchRequest {
     dateRange?: string;
     passThroughPort?: string[];
     ship?: string;
-    rateCode?: string;
+    rateCodes?: string[];
     numberOfGuests?: number;
 }
 
@@ -63,8 +63,9 @@ function toQs(params: ICruiseSearchRequest): string {
     if(params.ship) {
         arr.push("shipCode=" + encodeURIComponent(params.ship));
     }
-    if(params.rateCode) {
-        arr.push("rateCode=" + encodeURIComponent(params.rateCode));
+    if(params.rateCodes) {
+        const ptRateCodes = params.rateCodes.join(",");
+        arr.push("rateCode=" + encodeURIComponent(ptRateCodes));
     }
     if(params.dateRange) {
         const ranges = parseDateRange(params.dateRange);
