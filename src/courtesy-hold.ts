@@ -1,9 +1,9 @@
 import * as request from 'request';
 import * as qs from 'qs';
 import * as async from 'async';
-var cheerio = require('cheerio');
+import * as c from './constants';
 
-var base_url = "https://www.carnival.com";
+var cheerio = require('cheerio');
 
 export class CourtesyHoldAvailabilityRequest {
   optionDate: string;
@@ -45,7 +45,7 @@ export class CruiseDealsResponse {
 }
 
 export function checkIfAvailable(req: CourtesyHoldAvailabilityRequest, callback: (availability: CourtesyHoldAvailabilityResponse) => void) {
-  var url = `${base_url}/bookingengine/api/booking/courtesyhold/config?` + req.toQueryString();
+  var url = `${c.CARNIVAL_BASE_URL}/bookingengine/api/booking/courtesyhold/config?` + req.toQueryString();
   request.get(url, function (error: any, response: any, body: any) {
     var info = JSON.parse(body);
     var result = new CourtesyHoldAvailabilityResponse(info.depositHours, (info.depositHours > 0), info.token);
@@ -55,7 +55,7 @@ export function checkIfAvailable(req: CourtesyHoldAvailabilityRequest, callback:
 };
 
 export function getCruiseDeals(callback: (deals: CruiseDealsResponse) => void) {
-  request(`${base_url}/service/CruiseDealsPagePersonalizer.aspx`, function (error: any, response: any, body: any) {
+  request(`${c.CARNIVAL_BASE_URL}/service/CruiseDealsPagePersonalizer.aspx`, function (error: any, response: any, body: any) {
     let $ = cheerio.load(body);
     var limitedTimeOffersHtml = $('div[data-section="ad-category-container"]').first().find('.ccl-tout-front');
     var result = new CruiseDealsResponse();
@@ -66,7 +66,7 @@ export function getCruiseDeals(callback: (deals: CruiseDealsResponse) => void) {
       var deal = new CruiseDeal();
       var description = $front.text();
       deal.description = description.trim().replace(/[\r\n]/g, ', ').replace(/\*/g,'');
-      deal.url = base_url + $front.parent().find('.ccl-tout-back > a').attr('href');
+      deal.url = c.CARNIVAL_BASE_URL + $front.parent().find('.ccl-tout-back > a').attr('href');
       result.deals.push(deal);
     }
 
