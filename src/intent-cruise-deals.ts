@@ -29,7 +29,7 @@ export function pickCruiseDeal(assistant: ApiAiAssistant){
 
 function formatQuestion(deals: ch.CruiseDeal[]): string {
   var text = `We found ${deals.length} great deals for you. `;
-  text += deals.map((n, i) => `Number ${i + 1}: ${n.description}. `).join(", ");
-  text += ". What choice did you like?";
+  text += deals.map((n, i) => `Number ${i + 1}: ${n.description}`).join(". ");
+  text += " What choice did you like?";
   return text;
 }
