@@ -35,8 +35,6 @@ function makeCruiseSearch(assistant: ApiAiAssistant) {
         cruiseSearch(searchRequest, (response: ICruiseSearchResponse) => {
             const sailings = reduceResults(response, { metacode: stateroom_metacode });
             const sailingsData: ISailingData[] = flattenSailings(searchRequest.embkPortCode, sailings);
-            const question = formatResponse(sailingsData);
-            console.info(question, sailingsData);
             assistant.data[c.SAILINGS_DATA] = sailingsData;
             assistant.data[c.NUMBER_OF_GUESTS_DATA] = numberOfGuests;
             if (sailingsData.length == 0){
@@ -47,6 +45,8 @@ function makeCruiseSearch(assistant: ApiAiAssistant) {
             } else {
                 assistant.setContext(c.PROCEED_WITH_SAILING_CONTEXT);
             }
+            const question = formatResponse(sailingsData);
+            console.info(question, sailingsData);
             assistant.ask(question);
         });
     });

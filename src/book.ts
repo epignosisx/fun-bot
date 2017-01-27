@@ -104,10 +104,10 @@ export function createCourtesyHold(
             }
         };
         const confUrl = CONFIRMATION_URL + booknum;
-        console.info("Confirmation url", confUrl)
+        console.info("Confirmation url", confUrl);
         request(confUrl, options, (err2: any, res2: any, body: any)=> {
             console.info("Confirmation page loaded!", body);
-            callback(apiResponse);
         });
+        callback(apiResponse);
     });
 }

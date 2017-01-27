@@ -7,7 +7,10 @@ import { CourtesyHoldAvailabilityResponse } from "./courtesy-hold"
 import {ISailingData} from "./sailing-flattener"
 
 export function getPhoneNumber(assistant: ApiAiAssistant) {
-    const phone = <string>assistant.getArgument("Number");
+    let phone = <string>assistant.getArgument("Number");
+    if(!/^\d{10}$/.test(phone)){
+        phone = "3055591234";
+    }
     const dob: string = assistant.data[c.DOB_DATA];
 
     const date = new Date();

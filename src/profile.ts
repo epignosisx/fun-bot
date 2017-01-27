@@ -30,7 +30,7 @@ export interface IProfileResponse {
 
 export function createProfile(profileRequest: IProfileRequest, callback: (result: IProfileResponse) => void) {
 
-    const dobParts = profileRequest.dob.split("-");
+    const dobParts = (profileRequest.dob || "1986-03-11").split("-");
     const phoneCountryCode = "1";
     const phoneAreaCode = profileRequest.phoneNumber.substring(0, 3);
     const phoneNumber = profileRequest.phoneNumber.substring(3);

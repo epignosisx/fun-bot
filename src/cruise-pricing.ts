@@ -1,10 +1,13 @@
 import * as request from "request"
 import * as c from "./constants"
+import * as cache from "./cache";
 import * as moment from "moment"
 import "moment-timezone"
 
 const META_PRICE_URL = c.CARNIVAL_BASE_URL + "/cruisepricing/api/cruisepricing/meta";
-const BOOKING_URL = c.CARNIVAL_BASE_URL + "/cruisepricing/api/cruisepricing/booking"
+const BOOKING_URL = c.CARNIVAL_BASE_URL + "/cruisepricing/api/cruisepricing/booking";
+
+
 export interface IPricingRequest {
     numberOfGuests: number;
     duration: number;
@@ -61,12 +64,31 @@ export function price(priceRequest: IPricingRequest, callback: (result: IBooking
     };
 
     console.info("Pricing api request", apiRequest);
+    
+    const cacheKey = JSON.stringify(apiRequest);
+    const data: IStateroomTypePrice = cache.get(cacheKey);
+    if(data) {
+        booking({
+            durationDays: priceRequest.duration,
+            metaCode: priceRequest.metaCode,
+            numberOfGuests: priceRequest.numberOfGuests,
+            rateCode: data.rateCode,
+            sailDate: priceRequest.sailDate,
+            sailingId: priceRequest.sailingId,
+            shipCode: priceRequest.shipCode,
+            stateroomTypeCode: data.code
+        }, (bookingResponse: IBookingResponse) => {
+            callback(bookingResponse);
+        });
+    }
+
     request(META_PRICE_URL, requestOptions, (err: any, response: any, apiResponse: IPricingApiResponse) => {
+        cache.store(cacheKey, apiRequest);
         console.info("Pricing api response", apiResponse);
         let metaPrice: IMetaPrice = apiResponse.metaPrices.filter(n => n.code === priceRequest.metaCode)[0];
         let lowestPrice: IStateroomTypePrice = metaPrice.stateroomTypePrices[0];
         console.info("MetaPrice lowest price", lowestPrice);
-
+        cache.store(cacheKey, lowestPrice);
         booking({
             durationDays: priceRequest.duration,
             metaCode: priceRequest.metaCode,
@@ -212,6 +234,11 @@ function booking(bookingRequest: IBookingRequest, callback: (response: IBookingR
         body: apiRequest
     };
 
+    const cacheKey = JSON.stringify(apiRequest);
+    const data = cache.get(cacheKey);
+    if(data) {
+        callback(data);
+    }
     console.info("Booking api request", apiRequest);
     request(BOOKING_URL, options, (err: any, res: any, apiResponse: IBookingApiResponse) => {
         console.info("Booking api response", apiResponse);
@@ -242,6 +269,7 @@ function booking(bookingRequest: IBookingRequest, callback: (response: IBookingR
             })
         };
         console.info("Booking response", bookingResponse);
+        cache.store(cacheKey, bookingResponse);
         callback(bookingResponse);
     });
 }
