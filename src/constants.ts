@@ -1,5 +1,6 @@
 //contexts
 export const PICK_SAILING_CONTEXT = "pick-a-sailing";
+export const PROCEED_WITH_SAILING_CONTEXT = "proceed-with-sailing";
 export const GET_DATE_OF_BIRTH_CONTEXT = "get-dob";
 export const GET_DOB_CONTEXT = "get-dob";
 export const GET_PHONE_NUMBER_CONTEXT = "get-phone-number";

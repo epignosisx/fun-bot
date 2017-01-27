@@ -1,17 +1,31 @@
 import { ApiAiAssistant } from "actions-on-google"
 import * as c from "./constants"
-import {ISailingData, formatItineraryName} from "./sailing-flattener"
+import { ISailingData, formatItineraryName } from "./sailing-flattener"
 import { price, IBookingResponse } from "./cruise-pricing"
-import {checkIfAvailable, CourtesyHoldAvailabilityRequest, CourtesyHoldAvailabilityResponse} from "./courtesy-hold"
+import { checkIfAvailable, CourtesyHoldAvailabilityRequest, CourtesyHoldAvailabilityResponse } from "./courtesy-hold"
 
 export function pickASailing(assistant: ApiAiAssistant) {
     const choice = parseInt(<string>assistant.getArgument("Number"), 10);
     const sailings: ISailingData[] = assistant.data[c.SAILINGS_DATA];
-    if(choice < 1 || choice > sailings.length) {
+    if (choice < 1 || choice > sailings.length) {
         assistant.setContext(c.PICK_SAILING_CONTEXT);
         assistant.ask("What choice do you want? For example,you can say: Number 2");
         return;
     }
+    processSailingPick(assistant, choice, sailings);
+}
+
+export function proceedWithSailing(assistant: ApiAiAssistant) {
+    const sailings: ISailingData[] = assistant.data[c.SAILINGS_DATA];
+    const choice = <string>assistant.getArgument("YesNo");
+    if (choice == "Y"){
+        processSailingPick(assistant, 1, sailings);
+    }else {
+        assistant.tell("Ups you broke my heart, please start again.");
+    }
+}
+
+function processSailingPick(assistant: ApiAiAssistant, choice: number, sailings: ISailingData[]) {
     const selectedSailing: ISailingData = sailings[choice - 1];
     const numberOfGuests: number = assistant.data[c.NUMBER_OF_GUESTS_DATA];
     const priceRequest = {
@@ -27,7 +41,7 @@ export function pickASailing(assistant: ApiAiAssistant) {
         //make CH availability call
         const chRequest = createCourtesyHoldRequest(selectedSailing, result);
         checkIfAvailable(chRequest, (availability: CourtesyHoldAvailabilityResponse) => {
-            if(!availability.available) {
+            if (!availability.available) {
                 throw "Courtesy hold not available!";
             }
             let totalPrice = 0;
@@ -37,7 +51,7 @@ export function pickASailing(assistant: ApiAiAssistant) {
                 selectedSailing.departurePortName,
                 selectedSailing.destName,
                 selectedSailing.metacode,
-                totalPrice, 
+                totalPrice,
                 true,
                 selectedSailing.sailingDate
             );
