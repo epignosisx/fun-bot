@@ -2,8 +2,11 @@ import * as request from 'request';
 import * as qs from 'qs';
 import * as async from 'async';
 import * as c from './constants';
+import * as lru from 'lru-cache';
 
 var cheerio = require('cheerio');
+
+var cache = lru(50);
 
 export class CourtesyHoldAvailabilityRequest {
   optionDate: string;
@@ -55,34 +58,43 @@ export function checkIfAvailable(req: CourtesyHoldAvailabilityRequest, callback:
 };
 
 export function getCruiseDeals(callback: (deals: CruiseDealsResponse) => void) {
-  request(`${c.CARNIVAL_BASE_URL}/service/CruiseDealsPagePersonalizer.aspx`, function (error: any, response: any, body: any) {
-    let $ = cheerio.load(body);
-    var limitedTimeOffersHtml = $('div[data-section="ad-category-container"]').first().find('.ccl-tout-front');
-    var result = new CruiseDealsResponse();
+  var key = 'cruise-deals';
+  var cruiseDeals = cache.get(key) as CruiseDealsResponse;
+  if (cruiseDeals != undefined) {
+    console.info('retrieved cruise deals from cache');
+    callback(cruiseDeals);
+  } else {
+    request(`${c.CARNIVAL_BASE_URL}/service/CruiseDealsPagePersonalizer.aspx`, function (error: any, response: any, body: any) {
+      let $ = cheerio.load(body);
+      var limitedTimeOffersHtml = $('div[data-section="ad-category-container"]').first().find('.ccl-tout-front');
+      var result = new CruiseDealsResponse();
 
-    for (let i in limitedTimeOffersHtml) {
-      if (Number(i) > 1) { break; }
-      var $front = $(limitedTimeOffersHtml[i]);
-      var deal = new CruiseDeal();
-      var description = $front.text();
-      deal.description = description.trim().replace(/[\r\n]/g, ', ').replace(/\*/g,'');
-      deal.url = c.CARNIVAL_BASE_URL + $front.parent().find('.ccl-tout-back > a').attr('href');
-      result.deals.push(deal);
-    }
-
-    async.each(result.deals, function (deal, inner_callback) {
-      request(deal.url, function (error: any, response: any, body: any) {
-        let $ = cheerio.load(body);
-        var json = JSON.parse($('#hdnInitialData').val());
-        deal.rateCodes = json.rateCodes;
-        inner_callback();
-      });
-    }, function(err){
-      if (err){
-        console.error(`Error occurred processing deals: ${JSON.stringify(err)}`)
-      } else {
-        callback(result);
+      for (let i in limitedTimeOffersHtml) {
+        if (Number(i) > 1) { break; }
+        var $front = $(limitedTimeOffersHtml[i]);
+        var deal = new CruiseDeal();
+        var description = $front.text();
+        deal.description = description.trim().replace(/[\r\n]/g, ', ').replace(/\*/g, '');
+        deal.url = c.CARNIVAL_BASE_URL + $front.parent().find('.ccl-tout-back > a').attr('href');
+        result.deals.push(deal);
       }
+
+      async.each(result.deals, function (deal, inner_callback) {
+        request(deal.url, function (error: any, response: any, body: any) {
+          let $ = cheerio.load(body);
+          var json = JSON.parse($('#hdnInitialData').val());
+          deal.rateCodes = json.rateCodes;
+          inner_callback();
+        });
+      }, function (err) {
+        if (err) {
+          console.error(`Error occurred processing deals: ${JSON.stringify(err)}`)
+        } else {
+          cache.set(key, result);
+          console.info('stored cruise deals in cache');
+          callback(result);
+        }
+      });
     });
-  });
+  }
 };
