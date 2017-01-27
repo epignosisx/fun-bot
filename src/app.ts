@@ -7,6 +7,7 @@ import { flattenSailings, ISailingData } from "./sailing-flattener"
 import { bookACruise } from "./intent-book-a-cruise"
 import { pickASailing } from "./intent-pick-a-sailing";
 import { findCruiseDeals, pickCruiseDeal } from "./intent-cruise-deals";
+import {getDob} from "./intent-get-dob"
 import * as c from "./constants"
 import * as zillow from "./zillow";
 import * as ch from "./courtesy-hold";
@@ -64,6 +65,8 @@ app.post("/", (req: express.Request, res: express.Response) => {
     actionMap.set(c.PICK_A_SAILING_INTENT, pickASailing);
     actionMap.set(c.INTENT_FIND_CRUISE_DEAL, findCruiseDeals);
     actionMap.set(c.INTENT_PICK_CRUISE_DEAL, pickCruiseDeal);
+    actionMap.set(c.GET_DOB_INTENT, getDob);
+    //actionMap.set(c.GET_PHONE_NUMBER_INTENT, getPhoneNumber);
 
     assistant.handleRequest(actionMap);
 });
