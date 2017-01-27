@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node dist/app.js",
-    "build": "node_modules/.bin/tsc -p .",
+    "build": "node_modules/.bin/tsc -p . && cp -R -f src/static dist/static",
     "monitor": "nodemon dist/app.js"
   },
   "author": "",
