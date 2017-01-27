@@ -49,6 +49,7 @@ export class CruiseDealsResponse {
 
 export function checkIfAvailable(req: CourtesyHoldAvailabilityRequest, callback: (availability: CourtesyHoldAvailabilityResponse) => void) {
   var url = `${c.CARNIVAL_BASE_URL}/bookingengine/api/booking/courtesyhold/config?` + req.toQueryString();
+  console.info("Courtesy hold request", url);
   request.get(url, function (error: any, response: any, body: any) {
     var info = JSON.parse(body);
     var result = new CourtesyHoldAvailabilityResponse(info.depositHours, (info.depositHours > 0), info.token);

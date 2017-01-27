@@ -53,7 +53,7 @@ export function flattenSailings(sailings: IItinerarySailing[]): ISailingData[] {
 
 export function formatItineraryName(dur: number, departurePortName: string, regionName: string, metacode: string, price: number, includesTax: boolean, sailDate8601: string): string {
     let sailingDate = formatDate(sailDate8601);
-    let priceText = "$" + price;
+    let priceText = "$" + price.toFixed(2);
     if(includesTax) {
         priceText += " including taxes";
     }
@@ -65,7 +65,7 @@ export function formatItineraryName(dur: number, departurePortName: string, regi
         regionName,
         formatStateroomType(metacode),
         "for",
-        "$" + priceText,
+        priceText,
         "on",
         sailingDate
     ].join(" ");
