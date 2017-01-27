@@ -1,8 +1,15 @@
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import { ApiAiAssistant } from "actions-on-google";
+import {cruiseSearch, ICruiseSearchRequest, ICruiseSearchResponse} from "./cruise-search";
+import {reduceResultsTest, reduceResults} from "./results-reducer";
+import {flattenSailings, ISailingData} from "./sailing-flattener"
+import {bookACruise} from "./intent-book-a-cruise"
+import {pickASailing} from "./intent-pick-a-sailing";
+import * as c from "./constants"
 import * as zillow from "./zillow";
 import * as ch from "./courtesy-hold";
+
 
 process.env.DEBUG = 'actions-on-google:*';
 
@@ -34,14 +41,26 @@ app.get("/", (req: express.Request, res: express.Response) => {
     res.send("Hello world!" + new Date());
 });
 
+app.get("/search", (req: express.Request, res: express.Response) => {
+    // cruiseSearch({
+    //     dest: "BH"
+    // }, (results: any) => {
+    //     res.send(results);
+    // });
+
+    const data = reduceResultsTest();
+    res.send(data);
+});
+
 app.post("/", (req: express.Request, res: express.Response) => {
-    console.log('headers: ' + JSON.stringify(req.headers));
+    //console.log('headers: ' + JSON.stringify(req.headers));
     console.log('body: ' + JSON.stringify(req.body));
 
     const assistant = new ApiAiAssistant({ request: req, response: res });
 
-    let actionMap = new Map();
-    actionMap.set("carnival.book", bookCruiseIntent);
+    let actionMap = new Map(); 
+    actionMap.set(c.BOOK_A_CRUISE_INTENT, bookACruise);
+    actionMap.set(c.PICK_A_SAILING_INTENT, pickASailing)
 
     assistant.handleRequest(actionMap);
 });
@@ -51,7 +70,3 @@ var server = app.listen(app.get('port'), function () {
     console.log('App listening on port %s', server.address().port);
     console.log('Press Ctrl+C to quit.');
 });
-
-function bookCruiseIntent(assistant: ApiAiAssistant) {
-    assistant.tell("Webhook response!!");
-}
