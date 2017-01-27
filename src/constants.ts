@@ -26,9 +26,12 @@ export const PHONE_DATA = "PhoneNumber";
 
 //user info
 export const PERSON_NAME = "Alex";
+export const PERSON_LAST_NAME = "Hernandez";
 export const PERSON_STATE = "FL";
 export const PERSON_ADDRESS = "14525 SW 88TH ST APT J309";
 export const PERSON_ZIP = "33186";
 
 //app
 export const CARNIVAL_BASE_URL = "https://www.carnival.com";
+export const AntiForgeryTokenRequest = "CfDJ8GF3YfXobdFGjX6sML1_QN_0I6C5Rr8XqNrgjw86E3inX6ptpUyJcdseaObynYzpG7BIsxxNkYekImU9DrtgcUv_kGLlM9fZcykni6baxMJaovGW_cyUOC1_oB-nXUiZ0Kb6QexN_9hAapDiUGNd8gc";
+export const AntiForgeryCookie = ".AspNetCore.Antiforgery.EcNNjH4jnoY=CfDJ8GF3YfXobdFGjX6sML1_QN83mwiyjSmdHhmjtcV90I6ZilY0DsmXLZ-muLW00bYl1HA-tkN6AAm0_6Tx_6Vccpp_m1N1haVRzRARDIzqkZro6fUnJH3qpUaViaYLeQS1xQfZ2jPs9twiBnhtBHXk2uI";

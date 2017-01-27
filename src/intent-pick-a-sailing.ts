@@ -42,12 +42,12 @@ export function pickASailing(assistant: ApiAiAssistant) {
                 true,
                 selectedSailing.sailingDate
             );
-            
+
             assistant.data[c.CABIN_DATA] = result;
             assistant.data[c.COURTESY_HOLD_DATA] = availability;
             assistant.data[c.SELECTED_SAILING_DATA] = selectedSailing;
             assistant.setContext(c.GET_DATE_OF_BIRTH_CONTEXT);
-            assistant.ask(`Great! So I have you down for: ${itinName}. ${c.PERSON_NAME}, I'll just need a bit more of information to hold your stateroom. What's your date of birth?`);
+            assistant.ask(`Great! So I have you down for: ${itinName}. ${c.PERSON_NAME}. We can hold your stateroom for ${availability.depositHours} hours.I'll just need a bit more of information. What's your date of birth?`);
             return;
         });
     });
@@ -63,6 +63,6 @@ function createCourtesyHoldRequest(selectedSailing: ISailingData, result: IBooki
     chRequest.rateCode = selectedSailing.rateCode;
     chRequest.sailingDate = selectedSailing.sailingDate;
     chRequest.shipCode = selectedSailing.shipCode;
-    chRequest.stateroomTypeCode = result.stateroomTypeCode;
+    chRequest.stateroomTypeCode = result.stateroomTypeCode || "";
     return chRequest;
 }

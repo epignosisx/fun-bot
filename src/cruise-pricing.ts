@@ -217,6 +217,7 @@ function booking(bookingRequest: IBookingRequest, callback: (response: IBookingR
         const cabin = apiResponse.cabins[0];
         const deck = cabin.options.decks.filter(n => n.available)[0];
         const location = cabin.options.locations[0];
+        const room = cabin.options.rooms[0];
         let bookingResponse: IBookingResponse = {
             optionDate: cabin.courtesyHoldOptionDate,
             categoryCode: cabin.selections.categoryCode,
@@ -225,7 +226,7 @@ function booking(bookingRequest: IBookingRequest, callback: (response: IBookingR
             depositAmount: cabin.selections.totals.depositAmount,
             finalPaymentAmount: cabin.selections.totals.totalCabinAmount + cabin.selections.totals.totalTaxAndFees,
             isGratuitiesRequired: cabin.selections.forcePrepaidGratuities,
-            stateroomNumber: cabin.options.rooms[0].code,
+            stateroomNumber: room ? room.code : null,
             stateroomTypeCode: cabin.selections.stateroomTypeCode,
             upgradeCode: cabin.selections.upgradeCode,
             guestPrices: cabin.selections.totals.guestPrices.map(g =>  { 
