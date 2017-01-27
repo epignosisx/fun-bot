@@ -13,15 +13,17 @@ import * as c from "./constants"
 import * as zillow from "./zillow";
 import * as ch from "./courtesy-hold";
 import * as payment from "./payment";
+import * as path from "path";
 
 process.env.DEBUG = 'actions-on-google:*';
 
 const app = express();
 app.set('port', (process.env.PORT || 8080));
+app.use('/images', express.static(path.join(__dirname, '/static/images')));
 app.use(bodyParser.json({ type: 'application/json' }));
 
 app.get("/", (req: express.Request, res: express.Response) => {
-    var body = "<img style='max-width: 200px; max-height: 200px;' src='https://planetokashii.files.wordpress.com/2015/02/robot11.png' />";
+    var body = "<img style='max-width: 200px; max-height: 200px;' src='/images/fun-bot-logo.png' />";
     body += "<h1>Hi, I am your friendly Fun Bot, here to help you with Carnival Cruise Line bookings.</h1>";
     res.send(body);
 });
