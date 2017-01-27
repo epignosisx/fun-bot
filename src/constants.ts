@@ -16,7 +16,9 @@ export const SELECTED_SAILING_DATA = "SelectedSailing";
 export const NUMBER_OF_GUESTS_DATA = "NumberOfGuests";
 export const CABIN_DATA = "SelectedCabin";
 export const COURTESY_HOLD_DATA = "CourtesyHoldData";
-export const DOB_DATA = "DateOfBirth"
+export const DOB_DATA = "DateOfBirth";
+export const PHONE_DATA = "PhoneNumber";
+
 
 //user info
 export const PERSON_NAME = "Alex";

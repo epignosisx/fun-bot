@@ -215,11 +215,13 @@ function booking(bookingRequest: IBookingRequest, callback: (response: IBookingR
     request(BOOKING_URL, options, (err: any, res: any, apiResponse: IBookingApiResponse) => {
         console.info("Booking api response", apiResponse);
         const cabin = apiResponse.cabins[0];
+        const deck = cabin.options.decks.filter(n => n.available)[0];
+        const location = cabin.options.locations[0];
         let bookingResponse: IBookingResponse = {
             optionDate: cabin.courtesyHoldOptionDate,
             categoryCode: cabin.selections.categoryCode,
-            deckCode: cabin.options.decks.filter(n => n.available)[0].code,
-            locationCode: cabin.options.locations[0].code,
+            deckCode: deck ? deck.code : null,
+            locationCode: location ? location.code : null,
             depositAmount: cabin.selections.totals.depositAmount,
             finalPaymentAmount: cabin.selections.totals.totalCabinAmount + cabin.selections.totals.totalTaxAndFees,
             isGratuitiesRequired: cabin.selections.forcePrepaidGratuities,
